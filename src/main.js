@@ -1,5 +1,6 @@
 import { Application, Graphics, Text, TextStyle } from 'pixi.js';
 import { Vertex } from './vertex.js';
+import { Tile } from './tile.js';
 
 
 (async () => {
@@ -114,8 +115,21 @@ import { Vertex } from './vertex.js';
   player.y = 300;
   app.stage.addChild(player);
 
-  const vert = new Vertex(500, 200, 5);
-  app.stage.addChild(vert);
+  const vert1 = new Vertex(500, 200, 5);
+  const vert2 = new Vertex(550, 200, 5);
+  const vert3 = new Vertex(550, 250, 5);
+  const vert4 = new Vertex(500, 250, 5);
+
+  app.stage.addChild(vert1);
+  app.stage.addChild(vert2);
+  app.stage.addChild(vert3);
+  app.stage.addChild(vert4);
+
+  const vertices = [vert1, vert2, vert3, vert4];
+
+  const tile = new Tile(vertices);
+  app.stage.addChild(tile);
+  tile.refresh();
 
   // Moneta da raccogliere (Cerchio Dorato)
   const coin = new Graphics();
@@ -132,27 +146,7 @@ import { Vertex } from './vertex.js';
   window.addEventListener('keydown', (e) => { keys[e.key] = true; });
   window.addEventListener('keyup', (e) => { keys[e.key] = false; });
 
-  const polygon = new Graphics();
-
-// Definizione dei vertici del poligono (es. una stella/rombo a 4 punte)
-const vertici = [
-  200, 50,   // Punto 1 (x, y)
-  250, 150,  // Punto 2
-  350, 200,  // Punto 3
-  250, 250,  // Punto 4
-  200, 350,  // Punto 5
-  150, 250,  // Punto 6
-  50,  200,  // Punto 7
-  150, 150   // Punto 8
-];
-
-polygon
-  .poly(vertici)
-  .fill({ color: 0x8b5cf6 })              // Colore interno (Viola)
-  .stroke({ width: 4, color: 0xffffff }); // Bordo bianco
-
-app.stage.addChild(polygon);
-
+  
   // --- 4. GAME LOOP (Aggiornato a ogni frame) ---
   app.ticker.add(() => {
     // Movimento del Giocatore (WASD o Frecce)
