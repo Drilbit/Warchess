@@ -59,6 +59,7 @@ import { Tile } from './tile.js';
       target.x = mouseX;
       target.y = mouseY;
     }
+    tile.refresh(mouseX, mouseY);
   });
 
   // --- 2. PRESSIONE TASTI MOUSE SULL'OGGETTO ---
@@ -127,7 +128,7 @@ import { Tile } from './tile.js';
 
   const vertices = [vert1, vert2, vert3, vert4];
 
-  const tile = new Tile(vertices);
+  const tile = new Tile(vertices, Tile.Biome.SPIAGGIA);
   app.stage.addChild(tile);
   tile.refresh();
 
