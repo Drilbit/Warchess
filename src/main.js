@@ -1,4 +1,6 @@
 import { Application, Graphics, Text, TextStyle } from 'pixi.js';
+import { Vertex } from './vertex.js';
+
 
 (async () => {
   // 1. Inizializza l'applicazione PixiJS
@@ -15,6 +17,77 @@ import { Application, Graphics, Text, TextStyle } from 'pixi.js';
   // Aggiungi il canvas HTML al div #app
   document.getElementById('app').appendChild(app.canvas);
 
+  // Disabilita il menu contestuale del tasto destro del browser sul canvas
+  app.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  // Rende interattivo l'intero stage per tracciare il mouse ovunque
+  app.stage.eventMode = 'static';
+  app.stage.hitArea = app.screen;
+
+  const infoText = new Text({
+    text: 'Muovi il mouse... ',
+    style: { fontFamily: 'Arial', fontSize: 18, fill: '#ffffff' },
+  });
+  infoText.x = 20;
+  infoText.y = 20;
+  app.stage.addChild(infoText);
+
+  // --- OGGETTO INTERATTIVO (Cerchio) ---
+  const target = new Graphics();
+  target.circle(0, 0, 40).fill(0x3b82f6);
+  target.x = 400;
+  target.y = 300;
+
+  // ABILITA INTERATTIVITÀ SULL'OGGETTO
+  target.eventMode = 'static';
+  target.cursor = 'pointer';
+  app.stage.addChild(target);
+
+  let isDragging = false;
+
+  // --- 1. RILEVAMENTO POSIZIONE MOUSE ---
+  app.stage.on('pointermove', (event) => {
+    const mouseX = Math.round(event.global.x);
+    const mouseY = Math.round(event.global.y);
+
+    infoText.text = `Posizione Mouse: X: ${mouseX}, Y: ${mouseY}\n` +
+                    `Stato Drag: ${isDragging ? 'In corso...' : 'Inattivo'}`;
+
+    // Se stiamo trascinando l'oggetto, aggiorna la sua posizione con il mouse
+    if (isDragging) {
+      target.x = mouseX;
+      target.y = mouseY;
+    }
+  });
+
+  // --- 2. PRESSIONE TASTI MOUSE SULL'OGGETTO ---
+  target.on('pointerdown', (event) => {
+    // Tasto Sinistro (0) -> Inizia il drag
+    if (event.button === 0) {
+      isDragging = true;
+    } 
+    // Tasto Destro (2) -> Esegui un'azione (es. cambia colore)
+    else if (event.button === 2) {
+      const coloreCasuale = Math.floor(Math.random() * 0xffffff);
+      target.clear().circle(0, 0, 40).fill(coloreCasuale);
+    }
+  });
+
+  // --- 3. RILASCIO DEL TASTO (In qualsiasi punto dello schermo) ---
+  window.addEventListener('pointerup', () => {
+    isDragging = false;
+  });
+
+  // --- 4. EVENTI MOUSE HOVER (Passaggio sopra) ---
+  target.on('pointerover', () => {
+    target.clear().circle(0, 0, 40).fill("red");
+    target.circle(0, 0, 30).fill(0x3b82f6);
+  });
+
+  target.on('pointerout', () => {
+    target.clear().circle(0, 0, 40).fill(0x3b82f6);
+  });
+
   // --- STATO DEL GIOCO ---
   let score = 0;
   const speed = 5;
@@ -30,7 +103,7 @@ import { Application, Graphics, Text, TextStyle } from 'pixi.js';
     fill: '#ffffff',
   });
   const scoreText = new Text({ text: `Punteggio: ${score}`, style });
-  scoreText.x = 20;
+  scoreText.x = 300;
   scoreText.y = 20;
   app.stage.addChild(scoreText);
 
@@ -40,6 +113,9 @@ import { Application, Graphics, Text, TextStyle } from 'pixi.js';
   player.x = 400;
   player.y = 300;
   app.stage.addChild(player);
+
+  const vert = new Vertex(500, 200, 5);
+  app.stage.addChild(vert);
 
   // Moneta da raccogliere (Cerchio Dorato)
   const coin = new Graphics();
